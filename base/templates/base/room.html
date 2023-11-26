@@ -112,6 +112,7 @@
         </div>
 
       </div>
+      {% if request.user.is_authenticated %}
       {% if room.private %}
         {% if is_participant%}
         <div class="room__message">
@@ -145,6 +146,7 @@
             <input name="body" placeholder="Write your message here..." />
           </form>
         </div>
+      {% endif %}
       {% endif %}
 
     </div>
