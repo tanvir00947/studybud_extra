@@ -144,13 +144,25 @@ def userProfile(request, pk):
         # If Follow object does not exist, create a new one
         follow = Follow.objects.create(followed=user)
 
+    is_following= request.user in follow.followers.all()
+
+    followers_count=follow.followers.count()
+
+    following_count = user.followers.count()
+
     if request.method=='POST':
-        follow.followers.add(request.user)
-        return redirect('user-profile',pk=pk)
+        if request.user.is_authenticated:
+            if request.user not in follow.followers.all():
+                follow.followers.add(request.user)
+            else:
+                follow.followers.remove(request.user)
+            return redirect('user-profile',pk=pk)
+        else:
+            return redirect('login')
 
     #ends
     context = {'user': user, 'rooms': rooms,
-               'room_messages': room_messages, 'topics': topics,'follow':follow}
+               'room_messages': room_messages, 'topics': topics,'follow':follow,'is_following':is_following,'followers_count':followers_count,'following_count':following_count}
     return render(request, 'base/profile.html', context)
 
 
@@ -265,4 +277,23 @@ def acceptRequest(request, pk):
         joinRequest.save()
         return redirect('home')
     return render(request, 'base/approve_request.html', {'joinRequest': joinRequest})
+
+
+
+def followers(request,pk):
+    user = User.objects.get(id=pk)
+    follow = Follow.objects.get(followed=user)
+    followers=follow.followers.all()
+    context={'followers':followers}
+    return render(request,'base/followers.html',context)
+
+def following(request,pk):
+    user = User.objects.get(id=pk)
+    #rooms = user.room_set.all()
+    followings = user.followers.all()
+    #followings=user.follow_set.all()
+    print(followings)
+    context={'followings':followings}
+    return render(request,'base/following.html',context)
+
 

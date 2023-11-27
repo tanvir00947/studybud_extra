@@ -1,0 +1,34 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+
+<div class="participants">
+    
+    <h3 class="participants__top">
+        <a href="{{request.META.HTTP_REFERER}}">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 32 32">
+              <title>arrow-left</title>
+              <path
+                d="M13.723 2.286l-13.723 13.714 13.719 13.714 1.616-1.611-10.96-10.96h27.625v-2.286h-27.625l10.965-10.965-1.616-1.607z">
+              </path>
+            </svg>
+        </a>
+        Following <span>{{followings.count}}</span></h3>
+    <div class="participants__list scroll">
+      {% for following in followings %}
+      <a href="{%  url 'user-profile' following.followed.id %}" class="participant">
+        <div class="avatar avatar--medium">
+          <img src="{{following.followed.avatar.url}}" />
+        </div>
+        <p>
+          {{following.followed.name}}
+          <span>@{{following.followed.username}}</span>
+        </p>
+      </a>
+      {% endfor %}
+    </div>
+</div>
+
+
+{% endblock content %}

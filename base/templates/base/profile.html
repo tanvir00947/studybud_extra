@@ -21,11 +21,27 @@
           {% if request.user == user %}
           <a href="{% url 'update-user' %}" class="btn btn--main btn--pill">Edit Profile</a>
           {% else %}
-          <button class="btn btn--main btn--pill" method="POST" action=""> 
-            {% csrf_token %}
-            Follow 
-          </button>
+
+            {% if not is_following %}
+            <form class="form" method="POST" action="">
+              {% csrf_token %}
+              <div class="for__group">
+                  <input class="btn btn--main btn--pill" type="submit" value="Follow" />
+              </div>
+            </form>
+            {% else %}
+            <form class="form" method="POST" action="">
+              {% csrf_token %}
+              <div class="for__group">
+                  <input class="btn btn--main btn--pill" type="submit" value="Unfollow" />
+              </div>
+            </form>
+            {% endif %}
           {% endif %}
+          <h5 style="margin-top: 16px;">
+            <a href="{% url 'following' user.id %}" style="margin-right: 20px;"> following: {{following_count}} </a>
+            <a href="{% url 'followers' user.id %}"> followers: {{followers_count}} </a>
+           </h5>
         </div>
         <div class="profile__about">
           <h3>About</h3>
