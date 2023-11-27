@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
-from .models import Room, Topic, Message, User,Follow, JoinRequest
+from .models import Room, Topic, Message, User,Follow, JoinRequest,DirectMessage
 from .forms import RoomForm, UserForm, MyUserCreationForm
 
 # Create your views here.
@@ -296,4 +296,52 @@ def following(request,pk):
     context={'followings':followings}
     return render(request,'base/following.html',context)
 
+
+@login_required(login_url='login')
+def dm(request,pk):
+    user= User.objects.get(id=request.user.id)
+    receiver= User.objects.get(id=pk)  #jisse user chat karraha hai use receiver naam kiya hai
+    
+    #followings = user.followers.all()
+
+    # Get distinct users with whom the current user has sent or received messages
+    users_with_messages = User.objects.filter(
+        Q(sent_messages__sender=user) | Q(received_messages__receiver=user)
+    ).union(
+        User.objects.filter(
+            Q(sent_messages__receiver=user) | Q(received_messages__sender=user)
+        )
+    )
+
+
+    print(users_with_messages)
+    received_messages = DirectMessage.objects.filter(sender=user, receiver=receiver) | \
+                     DirectMessage.objects.filter(sender=receiver, receiver=user)
+
+
+
+    if request.method == 'POST':
+        directmessage = DirectMessage.objects.create(
+            sender=request.user,
+            receiver=receiver,
+            body=request.POST.get('body')
+        )
+        #room.participants.add(request.user)
+        return redirect('dm', pk=pk)
+    
+    context={'received_messages':received_messages,'receiver':receiver,'users_with_messages':users_with_messages}
+    return render(request,'base/dm.html',context)
+
+
+@login_required(login_url='login')
+def deleteDmMessage(request, pk):
+    message = DirectMessage.objects.get(id=pk)
+
+    if request.user != message.sender:
+        return HttpResponse('Your are not allowed here!!')
+
+    if request.method == 'POST':
+        message.delete()
+        return redirect('home')
+    return render(request, 'base/delete.html', {'obj': message})
 

@@ -57,7 +57,7 @@ class Message(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-updated', '-created']
+        ordering = ['updated', 'created']
 
     def __str__(self):
         return self.body[0:50]
@@ -72,3 +72,17 @@ class JoinRequest(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='join_requests')
     applicant=models.ForeignKey(User, on_delete=models.CASCADE)
     approveStatus=models.BooleanField(default=False)
+
+
+class DirectMessage(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE,related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    body = models.TextField()
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['updated', 'created']
+
+    def __str__(self):
+        return self.body[0:50]

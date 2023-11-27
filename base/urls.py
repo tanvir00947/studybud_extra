@@ -23,5 +23,8 @@ urlpatterns = [
     path('approve-request/<str:pk>/',views.acceptRequest,name="approve-request"),
 
     path('followers/<str:pk>/',views.followers,name="followers"),
-    path('following/<str:pk>/',views.following,name="following")
+    path('following/<str:pk>/',views.following,name="following"),
+ 
+    path('dm/<str:pk>/',views.dm,name="dm"),
+    path('delete-dm-message/<str:pk>/', views.deleteDmMessage, name="delete-dm-message"),
 ]
