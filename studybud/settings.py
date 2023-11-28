@@ -51,6 +51,8 @@ AUTH_USER_MODEL = 'base.User'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+
     "corsheaders.middleware.CorsMiddleware",
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -135,11 +137,13 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/images/'
 
 
-STATIC_ROOT = os.path.join(BASE_DIR,"staticfiles")
+
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR,"static"),
 ]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_ROOT = BASE_DIR / 'static/images'
 
@@ -152,3 +156,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+STORAGES = {
+    # ...
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
