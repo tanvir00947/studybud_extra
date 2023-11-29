@@ -97,6 +97,7 @@ def room(request, pk):
             requested=True
 
     is_participant = request.user in participants
+
     if room.private == True:
         if is_participant:
             if request.method == 'POST':
@@ -107,14 +108,28 @@ def room(request, pk):
                 )
                 room.participants.add(request.user)
                 return redirect('room', pk=room.id)
-        else:
+        elif not is_participant and not requested:
             if request.method=='POST':
                 JoinRequest.objects.create(
                     room=room,
                     applicant=request.user,
                 )
                 requested=True
-    
+                return redirect('room', pk=room.id)
+
+        elif not is_participant and requested:
+            if request.method=='POST':
+                # JoinRequest.objects.create(
+                #     room=room,
+                #     applicant=request.user,
+                # )
+                for joinRequest in joinRequests:
+                    if request.user == joinRequest.applicant and room==joinRequest.room:
+                        joinRequest.delete()
+
+                requested=False
+                return redirect('room', pk=room.id)
+
     else:
         if request.method == 'POST':
             message = Message.objects.create(

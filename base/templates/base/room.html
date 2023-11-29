@@ -133,9 +133,15 @@
 
             </form>
           </div>
-          {% else %}
+          {% elif requested and not is_participant %}
           <div class="room__message">
-            <h4>Requested to Join Room</h4>
+            <form class="form" method="POST" action="">
+              {% csrf_token %}
+              <div class="for__group">
+                  <input class="btn btn--main" type="submit" value="Delete Join Request" />
+              </div>
+
+            </form>
           </div>
           {% endif %}
         {% endif %}
