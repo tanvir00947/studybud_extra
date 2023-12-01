@@ -174,24 +174,24 @@
         </a>
         {% endfor %}
 
-        {% if room.host == request.user %}
-        <bold>Requests to join</bold>
+        {% if room.host == request.user and room.private %}
+          <bold> {{unAcceptedRequests}} Requests to join</bold>
 
-        {% for joinRequest in joinRequests %}
-        {% if not joinRequest.approveStatus %}
-        <a href="{%  url 'user-profile' joinRequest.applicant.id %}" class="participant">
-          <div class="avatar avatar--medium">
-            <img src="{{joinRequest.applicant.avatar.url}}" />
-          </div>
-          <p>
-            {{joinRequest.applicant.name}} 
-            <span>@{{joinRequest.applicant.username}}</span>
-          </p>
-        </a>
-        <a href="{% url 'approve-request' joinRequest.id %}">Accept</a>
-        <hr>
-        {% endif %}
-        {% endfor %}
+          {% for joinRequest in joinRequests %}
+            {% if not joinRequest.approveStatus %}
+            <a href="{%  url 'user-profile' joinRequest.applicant.id %}" class="participant">
+              <div class="avatar avatar--medium">
+                <img src="{{joinRequest.applicant.avatar.url}}" />
+              </div>
+              <p>
+                {{joinRequest.applicant.name}} 
+                <span>@{{joinRequest.applicant.username}}</span>
+              </p>
+            </a>
+            <a href="{% url 'approve-request' joinRequest.id %}">Accept</a>
+            <hr>
+            {% endif %}
+          {% endfor %}
 
         {% endif %}
 

@@ -89,6 +89,10 @@ def room(request, pk):
     participants = room.participants.all()
 
     joinRequests = room.join_requests.all()
+    unAcceptedRequests=0
+    for joinRequest in joinRequests:
+        if not joinRequest.approveStatus:
+            unAcceptedRequests+=1
 
     requested=False
 
@@ -142,7 +146,7 @@ def room(request, pk):
 
     context = {'room': room, 'room_messages': room_messages,
                'participants': participants,
-               'is_participant':is_participant,'joinRequests':joinRequests,'requested':requested}  #my context
+               'is_participant':is_participant,'joinRequests':joinRequests,'requested':requested,'unAcceptedRequests':unAcceptedRequests}  #my context
     return render(request, 'base/room.html', context)
 
 
