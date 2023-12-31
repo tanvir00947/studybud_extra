@@ -9,13 +9,54 @@
     <title>Cool Website</title>
 </head>
 <body>
-    <h1> Cool Rooms </h1>
-    <div id="rooms-container"></div>
+    <style>
+        .home-container {
+            display: grid;
+            grid-template-columns: 1fr 3fr 1fr;
+        }
+    </style>
+    
+    
+    <div class="home-container">
+    
+        <div id="topics-container">
+            
+        </div>
+        
+        <div id="feed-container">
+            <!-- <h5>{{room_count}} rooms available</h5>
+            <a href="{% url 'create-room' %}">Create Room</a> -->
+    
+            
+    
+        </div>
+        
+        <div id="activity-container">
+            <!-- {% include 'base/activity_component.html' %} -->
+        </div>
+    
+    </div>
 </body>
 
 <script>
-    let roomsContainer=document.getElementById('rooms-container')
 
+    let topicsContainer=document.getElementById('topics-container')
+    let getTopics= async ()=>{
+        let response= await fetch('http://127.0.0.1:8000/api/topics/')
+        let topics=await response.json()
+        console.log('topics:',topics)
+
+        for(let i=0;i<topics.length;i++){
+            let topic=topics[i]
+            let row=`<div>
+                            <h6>${topic.name}</h6>
+                    </div>`
+            topicsContainer.innerHTML +=row
+        }
+    }
+    getTopics()
+
+    let feedContainer=document.getElementById('feed-container')
     let getRooms= async ()=>{
         let response= await fetch('http://127.0.0.1:8000/api/rooms/')
         let rooms=await response.json()
@@ -23,14 +64,71 @@
 
         for(let i=0;i<rooms.length;i++){
             let room=rooms[i]
-            let row=`<div>
-                            <h3>${room.name}</h3>
-                    </div>`
-            roomsContainer.innerHTML +=row
+
+            let response_host= await fetch(`http://127.0.0.1:8000/api/users/${room.host}`)
+            let host=await response_host.json()
+
+            let response_topic= await fetch(`http://127.0.0.1:8000/api/topics/${room.topic}`)
+            let topic=await response_topic.json()
+
+            if(room.private){
+                let row=`<div>
+                            <h3>${room.name} <small>(private)</small></h3> 
+                            <h6>host @${host.username} </h6>
+                            <small>topic ${topic.name} </small> 
+                        </div><hr>`
+                feedContainer.innerHTML +=row
+            }
+            else{
+                let row=`<div>
+                            <h3>${room.name}</h3> 
+                            <h6>host @${host.username} </h6>
+                            <small>topic ${topic.name} </small>
+                        </div><hr>`
+                feedContainer.innerHTML +=row
+            }
+            
         }
     }
-
     getRooms()
+
+    let activityContainer=document.getElementById('activity-container')
+    let getMessages= async ()=>{
+        let response= await fetch('http://127.0.0.1:8000/api/messages/')
+        let messages=await response.json()
+        console.log('messages:',messages)
+
+        for(let i=0;i<messages.length;i++){
+            let message=messages[i]
+
+            let response_user= await fetch(`http://127.0.0.1:8000/api/users/${message.user}`)
+            let user=await response_user.json()
+
+            let row=`<div>  <small>@${user.username}</small>
+                            <p>${message.body}</p>
+                    </div><hr>`
+            activityContainer.innerHTML +=row
+        }
+    }
+    getMessages()
+
+    // let usersContainer=document.getElementById('users-container')
+
+    // let getUsers= async ()=>{
+    //     let response= await fetch('http://127.0.0.1:8000/api/users/')
+    //     let users=await response.json()
+    //     console.log('users:',users)
+
+    //     for(let i=0;i<users.length;i++){
+    //         let user=users[i]
+    //         let row=`<div>
+    //                         <h3>${user.name}</h3>
+    //                 </div>`
+    //         usersContainer.innerHTML +=row
+    //     }
+    // }
+
+    // getUsers()
 
 </script>
 
