@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from base.models import Room,User,Topic,Message
+from base.models import Room,User,Topic,Message,Follow
 
 
 class MessageSerializer(ModelSerializer):
@@ -70,3 +70,7 @@ class TopicSerializer(ModelSerializer):
         return obj.room_set.count()
 
 
+class FollowSerializer(ModelSerializer):
+    class Meta:
+        model= Follow
+        fields = '__all__'

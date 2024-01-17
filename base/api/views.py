@@ -155,27 +155,48 @@ def createRoomAPI(request):
 
     return Response({'message': 'Room created successfully'})
 
-@api_view(['GET'])
-def userProfileAPI(request,pk):
-    user = User.objects.get(id=pk)
+
+@api_view(['GET', 'POST'])
+def userProfileAPI(request, pk):
+    # Get the user instance or return a 404 response if not found
+    user = get_object_or_404(User, id=pk)
+    
+    # Retrieve related data
     rooms = user.room_set.all()
     room_messages = user.message_set.all()
     topics = Topic.objects.all()
 
-    user_data = UserSerializer(user,many=False).data
-    rooms_data=RoomSerializer(rooms,many=True).data
+    # Handle follow logic for POST requests for authenticated users
+    if request.method == 'POST' and request.user.is_authenticated:
+        follow, created = Follow.objects.get_or_create(followed=user)
+        if request.user not in follow.followers.all():
+            follow.followers.add(request.user)
+        else:
+            follow.followers.remove(request.user)
+
+    # Serialize the data
+    user_data = UserSerializer(user, many=False).data
+    rooms_data = RoomSerializer(rooms, many=True).data
     topics_data = TopicSerializer(topics, many=True).data
     messages_data = MessageSerializer(room_messages, many=True).data
 
+    # Get or create Follow instance
+    follow, created = Follow.objects.get_or_create(followed=user)
+    
+    # Additional data for follow status
+    is_following = request.user.is_authenticated and request.user in follow.followers.all()
+    followers_count = follow.followers.count()
+    following_count = user.followers.count()
+
     response_data = {
-        'user':user_data,
+        'user': user_data,
         'topics': topics_data,
         'rooms': rooms_data,
         'messages': messages_data,
+        'follow': {'is_following': is_following, 'followers_count': followers_count, 'following_count': following_count}
     }
 
     return Response(response_data)
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

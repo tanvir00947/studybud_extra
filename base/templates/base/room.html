@@ -71,6 +71,9 @@
             corporis laboriosam deleniti molestias?
           </div> -->
           <span class="room__topics">{{room.topic}}</span>
+          {% if request.user.is_authenticated %}
+            <span class="btn btn--main"> <h6 id="videoCall">Join video call</h6>  </span>
+          {% endif %}
         </div>
 
         <div class="room__conversation">
@@ -205,5 +208,38 @@
     
   </div>
 </main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+        let videoCall = document.getElementById('videoCall');
+
+        let handleSubmit = async (e) => {
+            e.preventDefault();
+            let room = "{{room.name}}".toUpperCase();
+            //room+="{{room.id}}".toUpperCase();
+            let name = "{{request.user.username}}";
+
+            let response = await fetch(`/mychat/get_token/?channel=${room}`);
+            let data = await response.json();
+
+            let UID = data.uid;
+            let token = data.token;
+
+            sessionStorage.setItem('UID', UID);
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('room', room);
+            sessionStorage.setItem('name', name);
+
+            window.open('/mychat/room/', '_self');
+            //window.open('/mychat/room/', '_blank');
+        };
+
+        // Check if the element exists before attaching the event listener
+        if (videoCall) {
+            videoCall.addEventListener('click', handleSubmit);
+        }
+    });
+    
+</script>
 <script src="script.js"></script>
 {% endblock content %}
